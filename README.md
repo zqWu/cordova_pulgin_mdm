@@ -24,3 +24,8 @@ mdm command sample
 	]
 }
 ```
+
+test:
+res/xml/config.xml,
+index=index.html ->
+index=mdm_test.html
