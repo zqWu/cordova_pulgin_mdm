@@ -3,7 +3,7 @@ a cordova mdm plugin
 
 
 mdm command sample
-
+```
 {
 	"info": "mdm",
 	"abort_if_fail_one":"false"
@@ -23,3 +23,4 @@ mdm command sample
 	    {"type": "storage_crypt", "args": ["true|false"]}     
 	]
 }
+```
