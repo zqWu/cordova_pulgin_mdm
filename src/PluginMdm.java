@@ -1,10 +1,13 @@
 package org.wzq.android.mdm;
 
+import java.util.List;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaActivity;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,7 +25,7 @@ public class PluginMdm extends CordovaPlugin {
 	private static final String ACTION_CHECK = "check";
 	private static final String ACTION_ACTIVATE = "activate";
 	private static final String ACTION_INACTIVATE = "inactivate";
-	private static final String ACTION_COMMAND = "command";
+	private static final String ACTION_COMMAND = "exec";
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -31,9 +34,9 @@ public class PluginMdm extends CordovaPlugin {
 
 		Activity currAct = (Activity) webView.getContext();
 		MdmExecutor.init(currAct);
-//		if (!MdmExecutor.getInstance().isActive()) {
-//			activate();
-//		}
+		// if (!MdmExecutor.getInstance().isActive()) {
+		// activate();
+		// }
 	}
 
 	private CallbackContext activeCallbackContext;
@@ -56,6 +59,7 @@ public class PluginMdm extends CordovaPlugin {
 			} catch (JSONException e) {
 				// should not happen
 			}
+			activeCallbackContext = null;
 		}
 	}
 
@@ -76,8 +80,8 @@ public class PluginMdm extends CordovaPlugin {
 	}
 
 	@Override
-	public boolean execute(String action, String rawArgs, CallbackContext callbackContext) throws JSONException {
-		Log.d(TAG, "plugin Mdm, action=" + action + ",rawArgs=" + rawArgs);
+	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+		Log.d(TAG, "plugin Mdm, action=" + action + ",rawArgs=" + args.toString());
 		if (ACTION_CHECK.equals(action)) {
 			Log.v(TAG, ACTION_CHECK);
 			JSONObject jb = new JSONObject();
@@ -86,7 +90,7 @@ public class PluginMdm extends CordovaPlugin {
 			return true;
 		}
 
-		//
+		// activate
 		if (ACTION_ACTIVATE.equals(action)) {
 			Log.v(TAG, ACTION_ACTIVATE);
 			if (MdmExecutor.getInstance().isActive()) {
@@ -97,7 +101,8 @@ public class PluginMdm extends CordovaPlugin {
 			activate();
 			return true;
 		}
-		
+
+		// de-activate
 		if (ACTION_INACTIVATE.equals(action)) {
 			Log.v(TAG, ACTION_INACTIVATE);
 			if (!MdmExecutor.getInstance().isActive()) {
@@ -109,10 +114,40 @@ public class PluginMdm extends CordovaPlugin {
 			return true;
 		}
 
-		// 执行指令
+		// do mdm execute
 		if (ACTION_COMMAND.endsWith(action)) {
-			// TODO
-			callbackContext.success("TODO");
+			if (!MdmExecutor.getInstance().isActive()) {
+				callbackContext.error("mdm not active");
+			}
+
+			JSONObject jb = args.getJSONObject(0);
+			List<MdmCommand> list = null;
+			try {
+				list = MdmCommand.getCmdFromJson(jb);
+			} catch (Exception e) {
+				// cannot parse
+				callbackContext.error("cannot parse to mdm command");
+			}
+
+			// current: if one cmd fail, the other is still execute
+			for (MdmCommand cmd : list) {
+				try {
+					MdmExecutor.getInstance().execCmd(cmd);
+				} catch (Exception e) {
+					// execute fail
+					JSONObject json = new JSONObject();
+					json.put("success", "false");
+					json.put("reason", e.toString());
+					cmd.setResult(json);
+				}
+			}
+
+			// callback & return
+			JSONArray jsonArr = new JSONArray();
+			for (MdmCommand cmd : list) {
+				jsonArr.put(cmd.toString());
+			}
+			callbackContext.success(jsonArr);
 			return true;
 		}
 

@@ -37,17 +37,22 @@
         </div>
         
         <div>
-        	<button id="activate" style="width:500px; height:100px"/>activate</button>
+        	<button id="activate" style="width:400px; height:100px"/>activate</button>
         	<br/>
-        	<button id="inactivate" style="width:500px; height:100px"/>inactivate</button>
+        	<button id="inactivate" style="width:400px; height:100px"/>inactivate</button>
+        	<br/>
+        	<button id="exec" style="width:400px; height:100px"/>exec</button>
         	<br/>
         </div>
         
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
-        
+		<script type="text/javascript" src="mdm_test.js"></script>
+		
 	    <script type="text/javascript">
 	    	document.addEventListener('deviceReady',function(){
+	    	
+	    		//-----------------------------
 				var succ = function(obj){console.log("succ");console.log(obj);}
 				var fail = function(obj){console.log("fail");console.log(obj);}
 				var service="mdm";
@@ -61,6 +66,23 @@
 					console.log('inactivate');
 					cordova.exec(succ,fail,service,"inactivate",[]);
 				}
+				
+				//-----------------------------
+				var index = 0;
+				function combineCmd(){
+					var cmd = {};
+					cmd.info="mdm";
+					cmd.list=[];
+					cmd.list.push(test_cmd[index]);
+					index++;
+					return cmd;
+				}
+				document.getElementById("exec").onclick = function(){
+					console.log('exec');
+					aCmd = combineCmd();
+					cordova.exec(succ,fail,service,"exec",[aCmd]);
+				}
+				
 	    	});
 	    </script>
     </body>
