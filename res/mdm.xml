@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.example.hello.abc"
+    version="0.0.2">
+
+    <name>mdm</name>
+    <description>cordova plugin mdm</description>
+    <author>wzq</author>
+    <keywords>cordova,plugin,mdm</keywords>
+    <license>Apache 2.0 License</license>
+
+    <asset src="www/mdm_test.html" target="mdm_test.html"/>     <!-- foloder -->
+
+
+<!--     <js-module src="www/hello.js" name="hello">
+        <clobbers target="greet123" />
+    </js-module> -->
+
+    <platform name="android">
+
+    	<!-- plugin config -->
+        <config-file target="res/xml/config.xml" parent="/*">
+		    <feature name="mdm">
+		    <param name="android-package" value="org.wzq.android.mdm.PluginMdm" />
+		    	<param name="onload" value="true" />
+			</feature>
+        </config-file>
+
+		<!-- java src code -->
+        <source-file src="src/PluginMdm.java" target-dir="src/org/wzq/android/mdm/"/>
+        <source-file src="src/MdmExecutor.java" target-dir="src/org/wzq/mdm/"/>
+        <source-file src="src/DeviceAdmin.java" target-dir="src/org/wzq/android/mdm/"/>
+        <!-- mdm config file -->
+		<source-file src="res/mdm.xml" target-dir="res/xml/"/>
+
+		<!-- manifest config -->
+		<config-file target="AndroidManifest.xml" parent="/manifest/application">
+	        <receiver
+	                android:name="org.wzq.android.mdm.DeviceAdmin"
+	                android:permission="android.permission.BIND_DEVICE_ADMIN">
+	            <meta-data
+	                    android:name="android.app.device_admin"
+	                    android:resource="@xml/mdm"/>
+	            <intent-filter>
+	                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED"/>
+	            </intent-filter>
+	        </receiver>
+        </config-file>
+
+    </platform>
+
+    <engines>
+        <engine name="cordova" version=">=3.5.0" platform="android"/>
+        <engine name="cordova-plugman" version=">=3.5.0" platform="android"/>
+    </engines>
+
+</plugin>
