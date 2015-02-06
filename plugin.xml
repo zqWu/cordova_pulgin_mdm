@@ -12,6 +12,7 @@
     <license>Apache 2.0 License</license>
 
     <asset src="www/mdm_test.html" target="mdm_test.html"/> 
+    <asset src="www/mdm_test.js" target="mdm_test.js"/> 
 
     <platform name="android">
 
@@ -27,6 +28,8 @@
         <source-file src="src/PluginMdm.java" target-dir="src/org/wzq/android/mdm/"/>
         <source-file src="src/MdmExecutor.java" target-dir="src/org/wzq/android/mdm/"/>
         <source-file src="src/DeviceAdmin.java" target-dir="src/org/wzq/android/mdm/"/>
+        <source-file src="src/MdmCmdType.java" target-dir="src/org/wzq/android/mdm/"/>
+        <source-file src="src/MdmCommand.java" target-dir="src/org/wzq/android/mdm/"/>
         <!-- mdm config file -->
 		<source-file src="res/mdm.xml" target-dir="res/xml/"/>
 
